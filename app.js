@@ -2,13 +2,19 @@ const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
 
+// dotenv
+require('dotenv').config({ path: './utils/.env' });
+
 const userRoutes = require('./routes/user');
 const sauceRoutes = require('./routes/sauce');
+
+const user = process.env.DB_USER;
+const pwd = process.env.DB_PWD;
 
 // MongoDB connection
 mongoose
   .connect(
-    'mongodb+srv://dafr:VbW3W84tNrw9uncT@cluster0.0zux7.mongodb.net/myFirstDatabase?retryWrites=true&w=majority',
+    `mongodb+srv://${user}:${pwd}@cluster0.0zux7.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`,
     {
       useNewUrlParser: true,
       useUnifiedTopology: true,
