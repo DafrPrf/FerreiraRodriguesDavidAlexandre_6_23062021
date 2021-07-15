@@ -10,16 +10,14 @@ const sauceRoutes = require('./routes/sauce');
 
 const user = process.env.DB_USER;
 const pwd = process.env.DB_PWD;
+const host = process.env.DB_HOST;
 
 // MongoDB connection
 mongoose
-  .connect(
-    `mongodb+srv://${user}:${pwd}@cluster0.0zux7.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`,
-    {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    }
-  )
+  .connect(`mongodb+srv://${user}:${pwd}@${host}?retryWrites=true&w=majority`, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => console.log('Connection to MongoDB successfully worked !'))
   .catch(() => console.log('Connection to MongoDB failed !'));
 

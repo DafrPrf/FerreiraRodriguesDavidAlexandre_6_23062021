@@ -60,38 +60,47 @@ exports.getAllSauces = (req, res, next) => {
 exports.likes = (req, res, next) => {
   const userId = req.body.userId;
   const like = req.body.like;
+  const sauceId = req.params.id;
 
-  Sauce.findOne({ _id: req.params.id })
+  Sauce.findOne({ _id: sauceId })
     .then((sauce) => {
-      if (like === 1 && !sauce.usersLiked.includes(userId)) {
-        Sauce.updateOne({
-          $inc: { likes: 1 },
-          $push: { usersLiked: userId },
-        })
+      if (like === 1) {
+        Sauce.updateOne(
+          { _id: sauceId },
+          { $push: { usersLiked: userId }, $inc: { likes: 1 } }
+        )
           .then(() => res.status(201).json({ message: 'liked' }))
           .catch((err) => res.status(400).json({ err }));
       }
-      if (like === -1 && !sauce.usersDisliked.includes(userId)) {
-        Sauce.updateOne({
-          $inc: { likes: 1 },
-          $push: { usersDisliked: userId },
-        })
+
+      if (like === -1) {
+        Sauce.updateOne(
+          { _id: sauceId },
+          { $push: { usersDisliked: userId }, $inc: { dislikes: 1 } }
+        )
           .then(() => res.status(201).json({ message: 'disliked' }))
           .catch((err) => res.status(400).json({ err }));
       }
+
       if (like === 0) {
-        console.log(like);
+        if (sauce.usersLiked.includes(userId)) {
+          Sauce.updateOne(
+            { _id: sauceId },
+            { $pull: { usersLiked: userId }, $inc: { likes: -1 } }
+          )
+            .then(() => res.status(201).json({ message: 'disliked' }))
+            .catch((err) => res.status(400).json({ err }));
+        }
 
-        Sauce.updateOne({
-          $inc: { likes: -1 },
-          $pull: { usersLiked: userId },
-        })
-          .then(() => res.status(201).json({ message: 'disliked' }))
-          .catch((err) => res.status(400).json({ err }));
+        if (sauce.usersDisliked.includes(userId)) {
+          Sauce.updateOne(
+            { _id: sauceId },
+            { $pull: { usersDisliked: userId }, $inc: { dislikes: -1 } }
+          )
+            .then(() => res.status(201).json({ message: 'disliked' }))
+            .catch((err) => res.status(400).json({ err }));
+        }
       }
-
-      console.log(sauce.usersLiked);
-      console.log(sauce.usersDisliked);
     })
     .catch((err) => res.status(404).json({ err }));
 };
